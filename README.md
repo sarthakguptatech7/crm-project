@@ -59,7 +59,7 @@ When a sheet is synced natively, the engine executes the following logic synchro
 5. The API downloads the public CSV export from Google Sheets, uses `papaparse` to format the strings, performs local SQLite query deduplication (checking existing emails/phones), and ingests all new leads through the Smart Assignment Route visually reflecting the changes via SWR auto-polling.
 
 ### 📸 Automation Screenshot
-> *(Take a screenshot of the Next.js Dashboard Native Sync Widget and place it here)*
+![Native Sync Dashboard](./public/screenshot.png)
 
 ---
 
