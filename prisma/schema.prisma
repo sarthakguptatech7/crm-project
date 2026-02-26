@@ -1,0 +1,31 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Caller {
+  id             String    @id @default(uuid())
+  name           String
+  role           String
+  languages      String    // Will store JSON array string or comma separated
+  dailyLimit     Int       @default(60)
+  assignedStates String    // Will store JSON array string or comma separated
+  lastAssignedAt DateTime  @default(now())
+  leads          Lead[]    // Relation mapped to leads
+}
+
+model Lead {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  phone     String
+  state     String
+  callerId  String?  // nullable in case no caller available
+  createdAt DateTime @default(now())
+
+  caller    Caller?  @relation(fields: [callerId], references: [id])
+}

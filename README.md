@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NexusCRM: Smart Sales Automation
 
-## Getting Started
+A real-time Sales CRM web application featuring intelligent Round-Robin lead assignment logic, role-based Caller quotas, and an innovative Dashboard integrating Native Google Sheets Sync—completely eliminating the need for Zapier or n8n.
 
-First, run the development server:
+## 🚀 Setup Instructions
+
+### 1. Prerequisites
+- Node.js (v18 or higher)
+- npm or yarn
+
+### 2. Installation
+Clone the repository, then navigate to the project directory:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <your-repo-link>
+cd project
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 3. Database Initialization
+This project uses **SQLite** through Prisma for zero-friction setup.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npx prisma db push
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 4. Running the Server Locally
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) with your browser to experience the Dashboard.
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 🏗 Development Logic & Database Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Database Structure (Prisma SQLite)
+The application fundamentally relies on two primary models:
+1. **`Caller`**: Represents a sales representative. It maintains fields for `name`, `languages` (stored as JSON array), `assignedStates` (for regional targeting), an integer for the `dailyLimit` (quota), and `lastAssignedAt` to manage perfect round-robin balancing.
+2. **`Lead`**: Represents an ingested lead from the automation flow. Contains `name`, `email`, `phone`, `state`, and optionally a `callerId` representing the foreign key to the assigned salesperson.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Smart Assignment Engine Logic (/api/sync)
+When a sheet is synced natively, the engine executes the following logic synchronously for each new row:
+1. **Quota Verification**: Queries Callers and filters out those who have reached their `dailyLimit` today (checked from 00:00 AM).
+2. **State/Regional Routing**: Scans `assignedStates`. If a caller operates in the lead's state, they are grouped. If *no* caller operates in that state, we gracefully fallback to the global pool of eligible callers.
+3. **Round-Robin Fair Distribution**: We sort the finalized candidate pool by `lastAssignedAt` in ascending order. The caller who has waited the longest receives the lead. We immediately update their timestamp.
+4. **Unassigned Fallback**: Should *every single representative* be capped out, the lead is safely ingested but left `Unassigned` so admins can re-assign later.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## ⚡ How Automation is Triggered 
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+*(Zero Zapier/n8n dependencies)*
+
+1. Navigate to the **Dashboard**.
+2. Locate the **Native Google Sheets Sync** widget at the top.
+3. Paste a **Publicly Viewable** Google Sheet URL. (Ensure it contains headers like `Name`, `Phone`, `Email`, and `State`).
+4. Click **Sync Sheet**. 
+5. The API downloads the public CSV export from Google Sheets, uses `papaparse` to format the strings, performs local SQLite query deduplication (checking existing emails/phones), and ingests all new leads through the Smart Assignment Route visually reflecting the changes via SWR auto-polling.
+
+### 📸 Automation Screenshot
+> *(Take a screenshot of the Next.js Dashboard Native Sync Widget and place it here)*
+
+---
+
+## 🔮 What I Would Improve With More Time
+
+1. **WebSockets for Absolute Real-time**: Swap `swr` interval polling for native WebSocket (e.g. Socket.io/Pusher) broadcasting so UI updates are 0ms instant to all active dashboard viewers when a server sync resolves.
+2. **PostgreSQL Migration**: Swap out SQLite for Postgres to handle highly concurrent sync requests safely, avoiding potential SQLite write locks if massive sheets arrive within milliseconds.
+3. **Admin Controls & Editing**: Provide full UI allowing managers to manually edit existing caller quotas on the fly, and a drag-and-drop kanban board to reassign `Unassigned` overflow leads to new reps the next morning.
+4. **OAuth Google Integration**: Rather than using public CSV exports, implement full Google OAuth so users can sync private Google Sheets dynamically.
