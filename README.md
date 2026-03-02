@@ -58,16 +58,15 @@ When a sheet is synced natively, the engine executes the following logic synchro
 4. Click **Sync Sheet**. 
 5. The API downloads the public CSV export from Google Sheets, uses `papaparse` to format the strings, performs local SQLite query deduplication (checking existing emails/phones), and ingests all new leads through the Smart Assignment Route visually reflecting the changes via SWR auto-polling.
 
-### 📸 Automation Screenshot
-![Native Sync Dashboard](./public/screenshot.png)
+
 
 ---
 
 ## � Evaluator Submission Links
 
 Please find the requested links for testing below:
-- **Test Google Sheet**: `[Insert your Google Sheets Link here]`
-- **Video Demo**: `[Insert your Google Drive Video Link here]`
+- **Test Google Sheet**: [Test Leads CRM](https://docs.google.com/spreadsheets/d/1E_tR8DQvFdvXokt6zvKAyYnHtOzC9aj69FWKHT9dofU/edit?usp=sharing)
+- **Video Demo**: [NexusCRM Automation Walkthrough](https://drive.google.com/file/d/13u3dq7DTBV30EsNApJJc_Z24Q8ShUGmj/view?usp=sharing)
 
 ---
 
