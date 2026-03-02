@@ -63,7 +63,15 @@ When a sheet is synced natively, the engine executes the following logic synchro
 
 ---
 
-## 🔮 What I Would Improve With More Time
+## � Evaluator Submission Links
+
+Please find the requested links for testing below:
+- **Test Google Sheet**: `[Insert your Google Sheets Link here]`
+- **Video Demo**: `[Insert your Google Drive Video Link here]`
+
+---
+
+## �🔮 What I Would Improve With More Time
 
 1. **WebSockets for Absolute Real-time**: Swap `swr` interval polling for native WebSocket (e.g. Socket.io/Pusher) broadcasting so UI updates are 0ms instant to all active dashboard viewers when a server sync resolves.
 2. **PostgreSQL Migration**: Swap out SQLite for Postgres to handle highly concurrent sync requests safely, avoiding potential SQLite write locks if massive sheets arrive within milliseconds.
